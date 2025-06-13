@@ -1,9 +1,6 @@
 import streamlit as st
 from utils import generate_landing_page
 from logger import init_logger
-from dotenv import load_dotenv
-
-load_dotenv()
 
 logger = init_logger()
 logger.info("Starting app")
@@ -24,7 +21,9 @@ user_input = st.text_area(
 if st.button("Generate", type="primary"):
     with st.spinner('Generating landing page...'):
         try:
-            generated_html_file = generate_landing_page()
+            logger.info('Starting to generate landing page')
+            generated_html_file = generate_landing_page(user_input)
+            logger.info('Landing page generation finished')
 
             # Display the generated code
             st.subheader("Generated Landing Page Code")
@@ -45,6 +44,7 @@ if st.button("Generate", type="primary"):
 
 
         except Exception as e:
+            logger.info('Failed to create landing page.')
             st.badge("Fail", icon=":material/cancel:", color="red")
             st.error(f"An error occurred: {str(e)}")
 

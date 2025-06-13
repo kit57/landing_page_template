@@ -1,19 +1,32 @@
 import openai
 import os
+from logger import init_logger
+from dotenv import load_dotenv
 
-from prompts import LANDING_CUSTOM_PAGE_TEMPLATE_PROMPT, LANDING_GENERAL_PAGE_TEMPLATE_PROMPT, ROLE_PROMPT
+from prompts import (
+                        LANDING_CUSTOM_PAGE_TEMPLATE_PROMPT,
+                        LANDING_GENERAL_PAGE_TEMPLATE_PROMPT,
+                        ROLE_PROMPT
+                    )
 
-# Set up OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+logger = init_logger()
+logger.info("OpenAI")
 
-# Initialize OpenAI client
-client = openai.OpenAI()
+load_dotenv()
 
-def generate_landing_page(user_input):
+# Initialize OpenAI client with api key
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def generate_landing_page(user_input: str) -> str:
+    """
+    Generates a landing page HTML string based on user input.
+    """
 
     if user_input.strip():
+        logger.info('Generating landing page with custom prompt')
         prompt = LANDING_CUSTOM_PAGE_TEMPLATE_PROMPT
     else:
+        logger.info('Generating landing page with general prompt')
         prompt = LANDING_GENERAL_PAGE_TEMPLATE_PROMPT
 
     response = client.chat.completions.create(
