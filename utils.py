@@ -1,7 +1,9 @@
 import openai
 import os
+from langfuse import observe
 from logger import init_logger
 from dotenv import load_dotenv
+from settings import Settings
 
 from prompts import (
                         LANDING_CUSTOM_PAGE_TEMPLATE_PROMPT,
@@ -11,12 +13,21 @@ from prompts import (
 
 logger = init_logger()
 logger.info("OpenAI")
+settings = Settings()
 
 load_dotenv()
 
 # Initialize OpenAI client with api key
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
+LANGFUSE_PUBLIC_KEY = os.getenv(settings.LANGFUSE_PUBLIC_KEY)
+LANGFUSE_SECRET_KEY = os.getenv(settings.LANGFUSE_SECRET_KEY)
+
+# Optional with defaults
+LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
+
+
+@observe()
 def generate_landing_page(user_input: str) -> str:
     """
     Generates a landing page HTML string based on user input.
