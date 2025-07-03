@@ -20,3 +20,8 @@ You then need to set the OPENAI_API_KEY. It's mandatory for the app to work prop
 Now you're good to start streamlit and start generating landing pages with OpenAI. Write on the command prompt the following line:
 
 ```streamlit run main.py```
+
+
+# LangFuse visualization
+
+You can login in [Cloud Langfuse](https://cloud.langfuse.com/) to check the traces of the application. It can show you how many tokens you have used, the total cost and the latency.
