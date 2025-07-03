@@ -1,6 +1,7 @@
 import openai
 import os
 from langfuse import observe
+import langfuse
 from logger import init_logger
 from dotenv import load_dotenv
 from settings import Settings
@@ -27,7 +28,7 @@ LANGFUSE_SECRET_KEY = os.getenv(settings.LANGFUSE_SECRET_KEY)
 LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
 
 
-@observe()
+@observe(name='openai_call')
 def generate_landing_page(user_input: str) -> str:
     """
     Generates a landing page HTML string based on user input.
@@ -40,13 +41,21 @@ def generate_landing_page(user_input: str) -> str:
         logger.info('Generating landing page with general prompt')
         prompt = LANDING_GENERAL_PAGE_TEMPLATE_PROMPT
 
-    response = client.chat.completions.create(
-    model="gpt-4o",
-    messages=[
-        {"role": "system", "content": ROLE_PROMPT},
-        {"role": "user", "content": prompt}
-    ],
-    max_tokens=2500
-    )
+    with langfuse.start_as_current_generation(
+                                        name="landing_page-generation",
+                                        model="gpt-4o",
+                                        input={"user_query": user_input}
+                                    ) as generation:
+
+        response = client.chat.completions.create(
+                                    model="gpt-4o",
+                                    messages=[
+                                        {"role": "system", "content": ROLE_PROMPT},
+                                        {"role": "user", "content": prompt}
+                                    ],
+                                    max_tokens=2500
+                                    )
+
+        generation.update(output=response,)
     
     return response.choices[0].message.content
